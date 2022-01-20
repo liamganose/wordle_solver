@@ -21,7 +21,7 @@ setup(
     long_description=read('README.md'),
     entry_points={
         'console_scripts': [
-            'solve = wordle_solver.cli:main',
+            'wordle = src.wordle_solver.cli:wordle'
         ],
     },
 )

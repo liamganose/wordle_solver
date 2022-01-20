@@ -9,14 +9,14 @@ Basic Selenium bot to automatically solve the daily wordle challenge.
 5. Make sure the driver location is in your PATH.
 
 ### Running
-1. To use the solver you should be in the root directory and run `wordle_solver solve`.
+1. To use the solver you should be in the root directory and run `wordle solve`.
 2. The default driver is set to Chrome but if you want to switch use the `--driver` (-d) flag. E.G.:
-    - `wordle_solver solve --driver Firefox`
+    - `wordle solve --driver Firefox`
 3. There are two solving methods available: `fast` and `accurate`. Accessed using the `--method` (-f) flag.
     - `fast` will attempt to solve it in fewer moves but has higher failure rate.
     - `accurate` will always get the correct answer but will not optimise attempts.
 
 ### Testing
 1. Make sure you've installed wordle_solver with the test suites.
-2. Run `wordle_solver test`.
-3. If you just want to check you've added the drivers correctly you can run `wordle_solver test --just-drivers` 
+2. Run `wordle test`.
+3. If you just want to check you've added the drivers correctly you can run `wordle test --just-drivers`
