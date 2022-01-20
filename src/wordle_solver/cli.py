@@ -1,6 +1,7 @@
 import click
 import pytest
 from src.wordle_solver.solver import solver
+from definitions import TEST_DIR
 
 @click.group()
 def wordle():
@@ -26,7 +27,7 @@ def solve(driver: str, method: str):
               is_flag=True, type=bool,
               help='whether to just test the Selenium driver is working.')
 def test(driver: str, just_drivers: bool):
-    args = ['-v', '-x', 'tests', '--driver', driver.title()]
+    args = ['-v', '-x', TEST_DIR, '--driver', driver.title()]
     if just_drivers:
         click.echo(f"Running driver tests.")
         pytest.main(args + ['-m', 'drivertest'])

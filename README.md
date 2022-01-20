@@ -1,10 +1,10 @@
 ### Info
-Basic Selenium bot to automatically solve the daily wordle challenge.
+Selenium bot to automatically solve the daily wordle challenge.
 
 ### Installation
 1. Download and install Python3.
 2. Clone this repo and `cd` into the wordle_solver directory.
-3. Run `pip install .` or `pip install ".[test]"` to install the test suite.
+3. Run `pip install .`
 4. Download the Selenium driver of your choice (https://selenium-python.readthedocs.io/installation.html#drivers).
 5. Make sure the driver location is in your PATH.
 
@@ -17,6 +17,5 @@ Basic Selenium bot to automatically solve the daily wordle challenge.
     - `accurate` will always get the correct answer but will not optimise attempts.
 
 ### Testing
-1. Make sure you've installed wordle_solver with the test suites.
-2. Run `wordle test`.
+2. Run `wordle test`
 3. If you just want to check you've added the drivers correctly you can run `wordle test --just-drivers`

@@ -16,7 +16,7 @@ setup(
     license = "BSD",
     url = 'https://github.com/liamganose/wordle_solver',
     keywords = "wordle solver bot",
-    packages=find_packages(),
+    packages = find_packages(),
     install_requires=require('requirements.txt'),
     long_description=read('README.md'),
     entry_points={
