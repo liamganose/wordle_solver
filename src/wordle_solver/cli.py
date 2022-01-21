@@ -15,9 +15,12 @@ def wordle():
               show_default=True,
               type=click.Choice(['fast', 'accurate']),
               help='the name of the Selenium driver to use.')
-def solve(driver: str, method: str):
+@click.option('--headless', '-h', default=False,
+              show_default=True, is_flag=True, type=bool,
+              help='whether or not to run Selenium without gui. (only works with chrome)')
+def solve(driver: str, method: str, headless: bool):
     click.echo(f"Running {method} Wordle solver on {driver}.")
-    solver(driver.title(), method)
+    solver(driver.title(), method, headless)
 
 @wordle.command()
 @click.option('--driver', '-d', default='Chrome',
@@ -26,11 +29,14 @@ def solve(driver: str, method: str):
 @click.option('--just-drivers', '-d', default=False, show_default=True,
               is_flag=True, type=bool,
               help='whether to just test the Selenium driver is working.')
-def test(driver: str, just_drivers: bool):
+@click.option('--headless', '-h', default=False,
+              show_default=True, is_flag=True, type=bool,
+              help='whether or not to run Selenium without gui. (only works with chrome)')
+def test(driver: str, just_drivers: bool, headless: bool):
     args = ['-v', '-x', TEST_DIR, '--driver', driver.title()]
     if just_drivers:
-        click.echo(f"Running driver tests.")
-        pytest.main(args + ['-m', 'drivertest'])
-    else:
-        click.echo(f"Running all tests.")
-        pytest.main(args)
+        args += ['-m', 'drivertest']
+    if headless:
+        args += ['--headless', 'True']
+    click.echo(f"Running tests...")
+    pytest.main(args)
