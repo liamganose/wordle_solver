@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.webelement import WebElement
+from selenium.webdriver.remote.webelement import WebElement
 
 GAME_URL = "https://www.powerlanguage.co.uk/wordle/"
 
