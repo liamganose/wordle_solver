@@ -37,6 +37,8 @@ def test(driver: str, just_drivers: bool, headless: bool) -> None:
     args = ['-v', '-x', TEST_DIR, '--driver', driver.title()]
     if just_drivers:
         args += ['-m', 'drivertest']
+    else:
+        args += ['-m', 'maintest']
     if headless:
         args += ['--headless', 'True']
     logger.info(f"Running tests...")
