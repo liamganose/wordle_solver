@@ -18,6 +18,7 @@ Element = NewType("Element", webdriver.remote.webelement.WebElement)
 ElementList = List[Element]
 
 def _get_guess(word_data: dict, guesses: int, words: WordList) -> str:
+    """Given a word list, number of guesses and past guesses, return a new word."""
     if guesses == 0:
         return "orate"
     
@@ -39,18 +40,22 @@ def _get_guess(word_data: dict, guesses: int, words: WordList) -> str:
     return words[0] 
 
 def _get_board(browser: webdriver, element: Element) -> Element:
+    """Get the board from within the shadow root of the HTML."""
     script: str = 'return arguments[0].shadowRoot.getElementById("board")'
     return browser.execute_script(script, element)
 
 def _get_tiles(browser: webdriver, row: Element) -> ElementList:
+    """Get the tiles from within the given row element."""
     script: str = 'return arguments[0].shadowRoot.querySelectorAll("game-tile")'
     return browser.execute_script(script, row)
 
 def _get_words() -> WordList:
+    """Get the list of words from the words file."""
     with open(WORDS_FILE, 'r') as f:
         return f.read().splitlines()
 
 def _run_game(browser: webdriver, root: Element, words: WordList) -> None:
+    """Loop through the rows and make a guess."""
     board: Element = _get_board(browser, browser.find_element(By.TAG_NAME, "game-app"))
     rows: ElementList = board.find_elements(By.TAG_NAME, "game-row")
     guesses: int = 0
