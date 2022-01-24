@@ -76,6 +76,7 @@ def _run_game(browser: webdriver, root: Element, words: WordList) -> None:
         logging.info(word_data)
         if correct == 5:
             logging.info(f"Correct answer: '{word}', found in {guesses} guesses.")
+            time.sleep(10)
             break
         if guesses == len(rows):
             logging.info("Ran out of guesses before getting the correct answer.")
