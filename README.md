@@ -11,8 +11,8 @@ Selenium bot to automatically solve the daily wordle challenge.
 5. Make sure the driver location is in your PATH.
 
 ### Running
-1. To use the solver you should be in the root directory and run `wordle solve`.
-2. The default driver is set to Chrome but if you want to switch use the `--driver` (-d) flag. E.G.:
+1. To use the solver you should run `wordle solve`.
+2. The default driver is set to Chrome but if you want to switch use the `--driver (-d)` flag. E.G.:
     - `wordle solve --driver Firefox`
 3. Use `--headless` to run without GUI.
 
