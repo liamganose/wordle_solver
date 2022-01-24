@@ -14,6 +14,8 @@ Selenium bot to automatically solve the daily wordle challenge.
     - `wordle solve --driver Firefox`
 3. Use `--headless` to run without GUI.
 
+![](demo.gif)
+
 ### Testing
 2. Run `wordle test`
 3. If you just want to check you've added the drivers correctly you can run `wordle test --just-drivers`
