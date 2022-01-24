@@ -1,6 +1,7 @@
 import time
 import re
 import logging
+import os
 from typing import List, Set, Tuple, NewType, Union
 
 from selenium import webdriver
@@ -8,8 +9,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 
+from definitions import ROOT_DIR
+
 GAME_URL: str = "https://www.powerlanguage.co.uk/wordle/"
-WORDS_FILE: str = "words.txt"
+WORDS_FILE: str = os.join(ROOT_DIR, "words.txt")
 WordList = List[str]
 Element = NewType("Element", webdriver.remote.webelement.WebElement)
 ElementList = List[Element]
