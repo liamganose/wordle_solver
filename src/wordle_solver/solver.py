@@ -106,6 +106,6 @@ def solver(driver: str, headless: bool) -> bool:
     time.sleep(1)
     logging.info("Running game...")
     _run_game(browser, root, words)
-    # leave the user to manually close the browser
-    if headless:
-        browser.quit()
+    # leave the window open for a while after the game finishes
+    time.sleep(10)
+    browser.quit()
