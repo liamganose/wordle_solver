@@ -1,6 +1,8 @@
 ### Info
 Selenium bot to automatically solve the daily wordle challenge.
 
+![](demo.gif)
+
 ### Installation
 1. Download and install Python3.
 2. Clone this repo and `cd` into the `wordle_solver` directory.
@@ -13,8 +15,6 @@ Selenium bot to automatically solve the daily wordle challenge.
 2. The default driver is set to Chrome but if you want to switch use the `--driver` (-d) flag. E.G.:
     - `wordle solve --driver Firefox`
 3. Use `--headless` to run without GUI.
-
-![](demo.gif)
 
 ### Testing
 2. Run `wordle test`
