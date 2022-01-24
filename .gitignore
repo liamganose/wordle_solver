@@ -40,3 +40,6 @@ venv.bak/
 
 # logs
 *.log
+
+# media
+*.gif
