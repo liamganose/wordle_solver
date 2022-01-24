@@ -4,12 +4,12 @@ from setuptools import setup, find_packages
 def read(fname: str) -> str:
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
-def require(fname: str) -> str:
+def require(fname: str) -> list[str]:
     return open(os.path.join(os.path.dirname(__file__), fname)).read().splitlines()
 
 setup(
     name = "wordle_solver",
-    version = "0.0.1",
+    version = "0.0.2",
     author = "Liam Ganose",
     author_email = "lganose@gmail.com",
     description = "Automatically solve the daily wordle challenge.",
