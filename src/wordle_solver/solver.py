@@ -12,7 +12,7 @@ from selenium.webdriver.chrome.options import Options
 from definitions import ROOT_DIR
 
 GAME_URL: str = "https://www.powerlanguage.co.uk/wordle/"
-WORDS_FILE: str = os.join(ROOT_DIR, "words.txt")
+WORDS_FILE: str = os.path.join(ROOT_DIR, "words.txt")
 WordList = List[str]
 Element = NewType("Element", webdriver.remote.webelement.WebElement)
 ElementList = List[Element]
@@ -75,7 +75,7 @@ def _run_game(browser: webdriver, root: Element, words: WordList) -> None:
                 word_data[evaluation].add(letter)
         logging.info(word_data)
         if correct == 5:
-            logging.info(f"Correct answer found in {guesses} guesses.")
+            logging.info(f"Correct answer: '{word}', found in {guesses} guesses.")
             break
         if guesses == len(rows):
             logging.info("Ran out of guesses before getting the correct answer.")
