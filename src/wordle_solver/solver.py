@@ -34,8 +34,14 @@ def _get_guess(word_data: dict, guesses: int, words: WordList) -> str:
         words = list(filter(lambda word: letter in word, words))
 
     # inverse filter on absent letters
-    for letter in word_data["absent"]:
+    # perform a subtract because double letters can cause a letter
+    # to appear twice
+    absent_letters: WordList = word_data["absent"] - word_data["present"] - \
+                                set(word_data["correct"].values())
+    for letter in absent_letters:
         words = list(filter(lambda word: letter not in word, words))
+
+    words = list(filter(lambda word: word not in word_data["guesses"], words))
 
     return words[0] 
 
@@ -59,10 +65,12 @@ def _run_game(browser: webdriver, root: Element, words: WordList) -> None:
     board: Element = _get_board(browser, browser.find_element(By.TAG_NAME, "game-app"))
     rows: ElementList = board.find_elements(By.TAG_NAME, "game-row")
     guesses: int = 0
-    word_data: dict = {"correct": dict(), "present": set(), "absent": set()}
+    word_data: dict = {"correct": dict(), "present": set(),
+                       "absent": set(), "guesses": set()}
     while(True):
         time.sleep(1)
         word: str = _get_guess(word_data, guesses, words)
+        word_data["guesses"].add(word)
         row: Element = rows[guesses]
         guesses += 1
         logging.info(f"guess = {guesses}, word = {word}")
@@ -88,7 +96,7 @@ def _run_game(browser: webdriver, root: Element, words: WordList) -> None:
 
 def get_driver(driver: str, headless: bool) -> webdriver:
     """Returns a driver class instance using the specified driver/options."""
-    options: Union[None,webdriver] = None
+    options: Union[None, webdriver] = None
     if headless and driver == "Chrome":
         options = Options()
         options.add_argument("--headless")
@@ -105,7 +113,9 @@ def solver(driver: str, headless: bool) -> bool:
     root.click() # get rid of popup
     time.sleep(1)
     logging.info("Running game...")
-    _run_game(browser, root, words)
-    # leave the window open for a while after the game finishes
-    time.sleep(10)
-    browser.quit()
+    try:
+        _run_game(browser, root, words)
+    finally:
+        # leave the window open for a while after the game finishes
+        time.sleep(5)
+        browser.quit()
