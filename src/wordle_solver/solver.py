@@ -2,7 +2,7 @@ import time
 import re
 import logging
 import os
-from typing import List, Set, Tuple, NewType, Union
+from typing import List, NewType, Union
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -16,6 +16,10 @@ WORDS_FILE: str = os.path.join(ROOT_DIR, "words.txt")
 WordList = List[str]
 Element = NewType("Element", webdriver.remote.webelement.WebElement)
 ElementList = List[Element]
+LETTER_RANKS = [
+    "e", "a", "r", "i", "o", "t", "n", "s", "l", "c", "u", "d", "p",
+    "m", "h", "g", "b", "f", "y", "w", "k", "v", "x", "z", "j", "q"
+]
 
 def _get_guess(word_data: dict, guesses: int, words: WordList) -> str:
     """Given a word list, number of guesses and past guesses, return a new word."""
@@ -42,6 +46,9 @@ def _get_guess(word_data: dict, guesses: int, words: WordList) -> str:
         words = list(filter(lambda word: letter not in word, words))
 
     words = list(filter(lambda word: word not in word_data["guesses"], words))
+
+    # sort list by rankings
+    words = sorted(words, lambda word: LETTER_RANKS.index(word))
 
     return words[0] 
 
