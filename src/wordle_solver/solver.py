@@ -49,7 +49,7 @@ def _get_guess(word_data: dict, guesses: int, words: WordList) -> str:
     words = list(filter(lambda word: word not in word_data["guesses"], words))
 
     # sort list by rankings
-    words = sorted(words, lambda word: LETTER_RANKS.index(word))
+    words = sorted(words, key=lambda word: LETTER_RANKS.index(word[0]))
 
     return words[0] 
 
