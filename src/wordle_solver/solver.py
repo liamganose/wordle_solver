@@ -44,7 +44,8 @@ def _get_guess(word_data: dict, guesses: int, words: WordList) -> str:
                                 set(word_data["correct"].values())
     for letter in absent_letters:
         words = list(filter(lambda word: letter not in word, words))
-
+    
+    # remove past guesses from the list
     words = list(filter(lambda word: word not in word_data["guesses"], words))
 
     # sort list by rankings
