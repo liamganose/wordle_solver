@@ -1,15 +1,16 @@
-import time
-import re
 import logging
 import os
+import re
+import time
 from typing import List, NewType, Union
 
+from definitions import ROOT_DIR
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.options import Options
-
-from definitions import ROOT_DIR
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 GAME_URL: str = "https://www.powerlanguage.co.uk/wordle/"
 WORDS_FILE: str = os.path.join(ROOT_DIR, "words.txt")
@@ -49,7 +50,10 @@ def _get_guess(word_data: dict, guesses: int, words: WordList) -> str:
     words = list(filter(lambda word: word not in word_data["guesses"], words))
 
     # sort list by rankings
-    words = sorted(words, key=lambda word: LETTER_RANKS.index(word[0]))
+    def _rank_function(word):
+        return sum(LETTER_RANKS.index(word[i]) for i in range(5))
+
+    words = sorted(words, key=_rank_function)
 
     return words[0] 
 
@@ -117,6 +121,8 @@ def solver(driver: str, headless: bool) -> bool:
     browser: webdriver = get_driver(driver, headless)
     browser.get(GAME_URL)
     logging.info(f"Opened {GAME_URL}.")
+    driver_wait = WebDriverWait(browser, 30)
+    _ = driver_wait.until(EC.presence_of_element_located((By.TAG_NAME, "game-app")))
     root: Element = browser.find_element(By.TAG_NAME, "html")
     root.click() # get rid of popup
     time.sleep(1)
