@@ -17,7 +17,7 @@ WORDS_FILE: str = os.path.join(ROOT_DIR, "words.txt")
 WordList = List[str]
 Element = NewType("Element", webdriver.remote.webelement.WebElement)
 ElementList = List[Element]
-LETTER_RANKS = [
+LETTERS_ORDERED = [
     "e", "a", "r", "i", "o", "t", "n", "s", "l", "c", "u", "d", "p",
     "m", "h", "g", "b", "f", "y", "w", "k", "v", "x", "z", "j", "q"
 ]
@@ -27,35 +27,29 @@ def _get_guess(word_data: dict, guesses: int, words: WordList) -> str:
     if guesses == 0:
         return "orate"
     
-    # filter using correct letters
-    reg_filter = [".", ".", ".", ".", "."]
-    for index, letter in word_data["correct"].items():
-        reg_filter[index] = letter
+    # filter for letters we know and definitely don't know
+    reg_filter = ["[a-z]", "[a-z]", "[a-z]", "[a-z]", "[a-z]"]
+    for i in range(5):
+        if i in word_data["correct"]:
+            reg_filter[i] = word_data["correct"][i]
+        else:
+            reg_filter[i] = f"[^{word_data['absent']}]"
     reg_filter = re.compile("".join(reg_filter))
     words = list(filter(reg_filter.match, words))
-    
+
     # filter on present letters
     for letter in word_data["present"]:
         words = list(filter(lambda word: letter in word, words))
-
-    # inverse filter on absent letters
-    # perform a subtract because double letters can cause a letter
-    # to appear twice
-    absent_letters: WordList = word_data["absent"] - word_data["present"] - \
-                                set(word_data["correct"].values())
-    for letter in absent_letters:
-        words = list(filter(lambda word: letter not in word, words))
     
     # remove past guesses from the list
     words = list(filter(lambda word: word not in word_data["guesses"], words))
-
-    # sort list by rankings
+    
+    # sort list by frequency rankings
     def _rank_function(word):
-        return sum(LETTER_RANKS.index(word[i]) for i in range(5))
-
+        return sum(LETTERS_ORDERED.index(word[i]) for i in range(5))
     words = sorted(words, key=_rank_function)
 
-    return words[0] 
+    return words[0]
 
 def _get_board(browser: webdriver, element: Element) -> Element:
     """Get the board from within the shadow root of the HTML."""
@@ -95,7 +89,8 @@ def _run_game(browser: webdriver, root: Element, words: WordList) -> None:
             letter: str = tile.get_attribute("letter")
             if evaluation == "correct":
                 correct += 1
-                word_data[evaluation][index] = letter
+                word_data["correct"][index] = letter
+                word_data["present"] = word_data["present"] - {letter}
             else:
                 word_data[evaluation].add(letter)
         logging.info(word_data)
