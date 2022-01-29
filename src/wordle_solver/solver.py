@@ -33,13 +33,22 @@ def _get_guess(word_data: dict, guesses: int, words: WordList) -> str:
         if i in word_data["correct"]:
             reg_filter[i] = word_data["correct"][i]
         else:
-            reg_filter[i] = f"[^{word_data['absent']}]"
+            reg_filter[i] = f"[^{word_data['absent'] - word_data['present']}]"
     reg_filter = re.compile("".join(reg_filter))
     words = list(filter(reg_filter.match, words))
 
     # filter on present letters
     for letter in word_data["present"]:
         words = list(filter(lambda word: letter in word, words))
+
+    # filter double letters
+    dbl_letters: set = word_data["absent"] & word_data["present"]
+    def _count_dbls(word):
+        for letter in dbl_letters:
+            if word.count(letter) > 1:
+                return False
+        return True
+    words = list(filter(_count_dbls, words))
     
     # remove past guesses from the list
     words = list(filter(lambda word: word not in word_data["guesses"], words))
