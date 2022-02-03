@@ -1,0 +1,16 @@
+name: run_daily
+
+on:
+  # run at 7am every morning
+  schedule:
+    - cron: "0 7 * * *"
+
+jobs:
+  build:
+    runs-on: selenium/standalone-chrome
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install and run
+        run: |
+          cd wordle_solver && pip install -e .
+          wordle solve --headless
