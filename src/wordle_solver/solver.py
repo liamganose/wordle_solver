@@ -24,10 +24,10 @@ LETTERS_ORDERED = [
 ]
 
 
-def _get_guess(word_data: dict, guesses: int, words: WordList) -> WordList | str:
+def _get_guess(word_data: dict, guesses: int, words: WordList) -> Union[WordList, str]:
     """Given a word list, number of guesses and past guesses, return a new word."""
     if guesses == 0:
-        return "orate"
+        return "crane"
 
     # filter for letters we know and definitely don't know
     reg_filter = ["", "", "", "", ""]
@@ -142,7 +142,7 @@ def get_driver(driver: str, headless: bool) -> webdriver:
     return getattr(webdriver, driver)(options=options)
 
 
-def solver(driver: str, headless: bool) -> bool | None:
+def solver(driver: str, headless: bool) -> None:
     """The main function to start selenium and solve the challenge."""
     words: WordList = _get_words()
     browser: webdriver = get_driver(driver, headless)
@@ -156,7 +156,6 @@ def solver(driver: str, headless: bool) -> bool | None:
     logging.info("Running game...")
     try:
         _run_game(browser, root, words)
-        return True
     finally:
         # leave the window open for a while after the game finishes
         time.sleep(5)
