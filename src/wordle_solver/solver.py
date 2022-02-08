@@ -4,15 +4,17 @@ import re
 import time
 from typing import List, NewType, Union
 
-from definitions import ROOT_DIR
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+
+from definitions import ROOT_DIR
 
 GAME_URL: str = "https://www.powerlanguage.co.uk/wordle/"
+# GAME_URL: str = "https://vue-wordle.netlify.app"
 WORDS_FILE: str = os.path.join(ROOT_DIR, "words.txt")
 WordList = List[str]
 Element = NewType("Element", webdriver.remote.webelement.WebElement)
@@ -22,69 +24,86 @@ LETTERS_ORDERED = [
     "m", "h", "g", "b", "f", "y", "w", "k", "v", "x", "z", "j", "q"
 ]
 
-def _get_guess(word_data: dict, guesses: int, words: WordList) -> str:
+
+def _get_guess(word_data: dict, guesses: int, words: WordList) -> WordList | str:
     """Given a word list, number of guesses and past guesses, return a new word."""
     if guesses == 0:
         return "orate"
-    
+
     # filter for letters we know and definitely don't know
-    reg_filter = ["[a-z]", "[a-z]", "[a-z]", "[a-z]", "[a-z]"]
+    reg_filter = ["", "", "", "", ""]
     for i in range(5):
         if i in word_data["correct"]:
             reg_filter[i] = word_data["correct"][i]
+        elif i in word_data["present_position"]:
+            reg_filter[
+                i] = f"[^{(word_data['absent'] - word_data['present']) | set(word_data['present_position'][i])} ]"
         else:
             reg_filter[i] = f"[^{word_data['absent'] - word_data['present']}]"
     reg_filter = re.compile("".join(reg_filter))
+    logging.info(f"reg_filter: {reg_filter}")
     words = list(filter(reg_filter.match, words))
+    logging.info(f"After filter left {len(words)} words: {words}")
 
     # filter on present letters
-    for letter in word_data["present"]:
-        words = list(filter(lambda word: letter in word, words))
+    for i in word_data["present"]:
+        words = list(filter(lambda word: i in word, words))
 
     # filter double letters
     dbl_letters: set = word_data["absent"] & word_data["present"]
+
     def _count_dbls(word):
         for letter in dbl_letters:
             if word.count(letter) > 1:
                 return False
         return True
+
     words = list(filter(_count_dbls, words))
-    
+
     # remove past guesses from the list
     words = list(filter(lambda word: word not in word_data["guesses"], words))
-    
+
     # sort list by frequency rankings
     def _rank_function(word):
         return sum(LETTERS_ORDERED.index(word[i]) for i in range(5))
+
     words = sorted(words, key=_rank_function)
 
-    return words[0]
+    return words
+
 
 def _get_board(browser: webdriver, element: Element) -> Element:
     """Get the board from within the shadow root of the HTML."""
     script: str = 'return arguments[0].shadowRoot.getElementById("board")'
     return browser.execute_script(script, element)
 
+
 def _get_tiles(browser: webdriver, row: Element) -> ElementList:
     """Get the tiles from within the given row element."""
     script: str = 'return arguments[0].shadowRoot.querySelectorAll("game-tile")'
     return browser.execute_script(script, row)
+
 
 def _get_words() -> WordList:
     """Get the list of words from the words file."""
     with open(WORDS_FILE, 'r') as f:
         return f.read().splitlines()
 
+
 def _run_game(browser: webdriver, root: Element, words: WordList) -> None:
     """Loop through the rows and make a guess."""
     board: Element = _get_board(browser, browser.find_element(By.TAG_NAME, "game-app"))
     rows: ElementList = board.find_elements(By.TAG_NAME, "game-row")
     guesses: int = 0
-    word_data: dict = {"correct": dict(), "present": set(),
+    word_data: dict = {"correct": dict(), "present_position": dict(), "present": set(),
                        "absent": set(), "guesses": set()}
-    while(True):
+    while True:
         time.sleep(1)
-        word: str = _get_guess(word_data, guesses, words)
+        if guesses > 0:
+            words: WordList = _get_guess(word_data, guesses, words)
+            word: str = words[0]
+        else:
+            word: str = _get_guess(word_data, guesses, words)
         word_data["guesses"].add(word)
         row: Element = rows[guesses]
         guesses += 1
@@ -100,6 +119,9 @@ def _run_game(browser: webdriver, root: Element, words: WordList) -> None:
                 correct += 1
                 word_data["correct"][index] = letter
                 word_data["present"] = word_data["present"] - {letter}
+            elif evaluation == "present":
+                word_data["present_position"][index] = letter
+                word_data[evaluation].add(letter)
             else:
                 word_data[evaluation].add(letter)
         logging.info(word_data)
@@ -110,6 +132,7 @@ def _run_game(browser: webdriver, root: Element, words: WordList) -> None:
             logging.info("Ran out of guesses before getting the correct answer.")
             break
 
+
 def get_driver(driver: str, headless: bool) -> webdriver:
     """Returns a driver class instance using the specified driver/options."""
     options: Union[None, webdriver] = None
@@ -119,20 +142,22 @@ def get_driver(driver: str, headless: bool) -> webdriver:
         options.add_argument("--no-sandbox")
     return getattr(webdriver, driver)(options=options)
 
-def solver(driver: str, headless: bool) -> bool:
+
+def solver(driver: str, headless: bool) -> bool | None:
     """The main function to start selenium and solve the challenge."""
     words: WordList = _get_words()
     browser: webdriver = get_driver(driver, headless)
     browser.get(GAME_URL)
     logging.info(f"Opened {GAME_URL}.")
     driver_wait = WebDriverWait(browser, 30)
-    _ = driver_wait.until(EC.presence_of_element_located((By.TAG_NAME, "game-app")))
+    _ = driver_wait.until(ec.presence_of_element_located((By.TAG_NAME, "game-app")))
     root: Element = browser.find_element(By.TAG_NAME, "html")
-    root.click() # get rid of popup
+    root.click()  # get rid of popup
     time.sleep(1)
     logging.info("Running game...")
     try:
         _run_game(browser, root, words)
+        return True
     finally:
         # leave the window open for a while after the game finishes
         time.sleep(5)
