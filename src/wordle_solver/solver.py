@@ -14,7 +14,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from definitions import ROOT_DIR
 
 GAME_URL: str = "https://www.powerlanguage.co.uk/wordle/"
-# GAME_URL: str = "https://vue-wordle.netlify.app"
 WORDS_FILE: str = os.path.join(ROOT_DIR, "words.txt")
 WordList = List[str]
 Element = NewType("Element", webdriver.remote.webelement.WebElement)
@@ -41,13 +40,13 @@ def _get_guess(word_data: dict, guesses: int, words: WordList) -> WordList | str
         else:
             reg_filter[i] = f"[^{word_data['absent'] - word_data['present']}]"
     reg_filter = re.compile("".join(reg_filter))
-    logging.info(f"reg_filter: {reg_filter}")
+    logging.info(f"{reg_filter=}")
     words = list(filter(reg_filter.match, words))
     logging.info(f"After filter left {len(words)} words: {words}")
 
     # filter on present letters
-    for i in word_data["present"]:
-        words = list(filter(lambda word: i in word, words))
+    for letter in word_data["present"]:
+        words = list(filter(lambda word: letter in word, words))
 
     # filter double letters
     dbl_letters: set = word_data["absent"] & word_data["present"]
