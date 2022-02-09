@@ -18,7 +18,7 @@ WORDS_FILE: str = os.path.join(ROOT_DIR, "words.txt")
 WordList = List[str]
 Element = NewType("Element", webdriver.remote.webelement.WebElement)
 ElementList = List[Element]
-LETTERS_ORDERED = [
+LETTERS_ORDERED: List[str] = [
     "e", "a", "r", "i", "o", "t", "n", "s", "l", "c", "u", "d", "p",
     "m", "h", "g", "b", "f", "y", "w", "k", "v", "x", "z", "j", "q"
 ]
